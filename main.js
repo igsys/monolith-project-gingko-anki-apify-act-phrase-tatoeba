@@ -28,6 +28,7 @@ const getWordCount = str => {
 }
 
 const getPageContent = async (uri, browser, counter) => {
+    // only limit to certain number of entries
     if (counter === 2) return definitions
     const page = await browser.newPage()
     await page.goto(uri, {
@@ -36,11 +37,14 @@ const getPageContent = async (uri, browser, counter) => {
     let html = await page.content()
     let $ = cheerio.load(html)
 
+    // get entries
     let definitions = []
     $('.sentence-and-translations').each((i, elem) => {
+        // only limit to certain number of entries
         if (counter === 2) return definitions
         const phrase_mono = $(elem).find('.sentence.layout-row').eq(0).find('.text.flex').text().trim()
         const phrase_mono_puntuation_removed = phrase_mono.replace('!', '').trim()
+        // capture phrases with words greater than defined number
         if (getWordCount(phrase_mono_puntuation_removed) >= 3) {
             const phrase_tran = $(elem).find('.translation.layout-row').eq(0).find('.text.flex').text().trim()
             definitions.push({
