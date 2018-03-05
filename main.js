@@ -47,7 +47,8 @@ const getPageContent = async (uri, browser, counter) => {
     $('.sentence-and-translations').each((i, elem) => {
         if (counter === 2) return definitions
         const phrase_mono = $(elem).find('.sentence.layout-row').eq(0).find('.text.flex').text().trim()
-        if (getWordCount(phrase_mono) >= 3) {
+        const phrase_mono_puntuation_removed = phrase_mono.replace('!', '').trim()
+        if (getWordCount(phrase_mono_puntuation_removed) >= 3) {
             const phrase_tran = $(elem).find('.translation.layout-row').eq(0).find('.text.flex').text().trim()
             definitions.push({
                 meaning: phrase_tran,
@@ -65,17 +66,6 @@ const getPageContent = async (uri, browser, counter) => {
     return definitions
 }
 
-// {
-//     "meaning": "pass (sth.)",
-//         "grammar": "v",
-//             "examples": [
-//                 {
-//                     "level": "INTERMEDIATE",
-//                     "mono": "Il a demandé à sa sœur de lui passer le sel.",
-//                     "tran": "He asked his sister to pass him the salt."
-//                 }
-//             ]
-// },
 Apify.main(async () => {
     // Fetch the input and check it has a valid format
     // You don't need to check the input, but it's a good practice.
@@ -96,9 +86,9 @@ Apify.main(async () => {
     const browser = await launchPuppeteer()
 
     // Navigate to each Tatoeba.org page
-    let counter = 0
+    var counter = 0
     let definitions = []
-    for (i = 1; i < 2; i++) {
+    for (i = 1; i < 3; i++) {
         const uri = `https://tatoeba.org/eng/sentences/search/page:${i}?query=${input.query}&from=${getLanguage(input.source)}&to=eng&orphans=no&unapproved=no&native=yes&user=&tags=&list=&has_audio=&trans_filter=limit&trans_to=eng&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort=words`
         const response = await getPageContent(uri, browser, counter)
         definitions = definitions.concat(response)
