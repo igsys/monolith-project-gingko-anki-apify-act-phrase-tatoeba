@@ -1,3 +1,5 @@
 {
-    "message": "Hello world!"
+  "dictionary": "english-french",
+  "source": "french",
+  "query": "passer"
 }
