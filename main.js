@@ -24,19 +24,21 @@ const getLanguage = language => {
 }
 
 const getPageContent = async (uri, browser) => {
-    const page = await browser.newPage();
-    await page.goto(uri);
-    let html = await page.content();
-    let $ = cheerio.load(html);
+    const page = await browser.newPage()
+    await page.goto(uri, {
+        timeout: 200000,
+    })
+    let html = await page.content()
+    let $ = cheerio.load(html)
 
     let results = []
-
-    $('.sentence-and-translations').each(elem => {
+    $('.sentence-and-translations').each((i, elem) => {
         results.push({
-            phrase_mono: $(elem).find('.sentence.layout-row').text().trim(),
-            phrase_tran: $(elem).find('.translation.layout-row').text().trim()
+            phrase_mono: $(elem).find('.sentence.layout-row').eq(0).find('.text.flex').text().trim(),
+            phrase_tran: $(elem).find('.translation.layout-row').eq(0).find('.text.flex').text().trim()
         })
     })
+    await page.close()
     return results
 }
 
@@ -56,19 +58,16 @@ Apify.main(async () => {
     console.log(`Input query: ${input.query}`)
 
     // Environment variables
-    const launchPuppeteer = process.env.NODE_ENV === 'development' ? puppeteer.launch : Apify.launchPuppeteer;
-    const browser = await launchPuppeteer();
+    const launchPuppeteer = process.env.NODE_ENV === 'development' ? puppeteer.launch : Apify.launchPuppeteer
+    const browser = await launchPuppeteer()
 
     // Navigate to each Tatoeba.org page
-
     let phrases = []
-    const array = [1, 2]
-
-    await array.forEach(i => {
+    for (i = 1; i < 3; i++) {
         const uri = `https://tatoeba.org/eng/sentences/search/page:${i}?query=${input.query}&from=${getLanguage(input.source)}&to=eng&orphans=no&unapproved=no&native=yes&user=&tags=&list=&has_audio=&trans_filter=limit&trans_to=eng&trans_link=&trans_user=&trans_orphan=&trans_unapproved=&trans_has_audio=&sort=words`
         const response = await getPageContent(uri, browser)
         phrases = phrases.concat(response)
-    })
+    }
 
     // Store the output
     const output = {
