@@ -56,7 +56,7 @@ const getPageContent = async (uri, browser, counter) => {
     let definitions = []
     $('.sentence-and-translations').each((i, elem) => {
         // only limit to certain number of entries
-        if (counter === ENTRIES_MAX) return definitions
+        if (counter == ENTRIES_MAX) return definitions
         const phrase_mono = $(elem).find('.sentence.layout-row').eq(0).find('.text.flex').text().trim()
         // TODO: remove other puntuation marks like ? ! with regex
         const phrase_mono_puntuation_removed = phrase_mono.replace('!', '').trim()
